@@ -1,9 +1,8 @@
-import { Hand } from '@/components/ui/card';
+import { BettingPanel } from '@/components/ui/betting';
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-    // Sample cards for display
     const dealerCards = [
         { rank: 'K', suit: '♠', faceDown: false },
         { rank: '?', suit: '', faceDown: true },
@@ -14,17 +13,18 @@ export default function HomeScreen() {
         { rank: 'A', suit: '♠', faceDown: false },
     ];
 
+    const handleDeal = (bet: number) => {
+        console.log('Deal pressed with bet:', bet);
+        // TODO: Start the game with this bet amount
+    };
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.gameArea}>
-                {/* Dealer's hand at the top */}
-                <Hand cards={dealerCards} label="Dealer" />
-
-                {/* Spacer */}
+                {/* <Hand cards={dealerCards} label="Dealer" />
                 <View style={styles.spacer} />
-
-                {/* Player's hand at the bottom */}
-                <Hand cards={playerCards} label="Player" />
+                <Hand cards={playerCards} label="Player" /> */}
+                <BettingPanel onDeal={handleDeal} />
             </View>
         </SafeAreaView>
     );
