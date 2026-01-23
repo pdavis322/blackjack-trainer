@@ -24,7 +24,7 @@ export function Chip({
     return (
         <Pressable
             onPress={onPress}
-            style={({ pressed }) => [
+            style={({ pressed }: { pressed: boolean }) => [
                 styles.chip,
                 {
                     backgroundColor: colors.bg,
@@ -79,8 +79,7 @@ export function BettingPanel({
             </View>
 
             <View style={styles.betDisplay}>
-                <Text style={styles.betLabel}>Current Bet</Text>
-                <Text style={styles.betAmount}>${bet}</Text>
+                <Text style={styles.betAmount}>{bet}</Text>
             </View>
 
             <Pressable
