@@ -1,38 +1,141 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useEffect, useRef } from 'react';
+import { Animated, StyleSheet, Text, View } from 'react-native';
 
-// Card component
-export function Card({ rank, suit, faceDown = false }: { rank?: string; suit?: string; faceDown?: boolean }) {
+// Card component with optional animation
+export function Card({
+    rank,
+    suit,
+    faceDown = false,
+    animate = false,
+    animationDelay = 0,
+    discarding = false,
+}: {
+    rank?: string;
+    suit?: string;
+    faceDown?: boolean;
+    animate?: boolean;
+    animationDelay?: number;
+    discarding?: boolean;
+}) {
+    const translateX = useRef(new Animated.Value(animate ? 300 : 0)).current;
+    const translateY = useRef(new Animated.Value(animate ? -300 : 0)).current;
+    const opacity = useRef(new Animated.Value(animate ? 0 : 1)).current;
+    const scale = useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+        if (animate) {
+            // Reset to starting position
+            translateX.setValue(300);
+            translateY.setValue(-300);
+            opacity.setValue(0);
+
+            // Animate to final position with delay
+            setTimeout(() => {
+                Animated.parallel([
+                    Animated.timing(translateX, {
+                        toValue: 0,
+                        duration: 400,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(translateY, {
+                        toValue: 0,
+                        duration: 400,
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(opacity, {
+                        toValue: 1,
+                        duration: 200,
+                        useNativeDriver: true,
+                    }),
+                ]).start();
+            }, animationDelay);
+        }
+    }, [animate, animationDelay, translateX, translateY, opacity]);
+
+    useEffect(() => {
+        if (discarding) {
+            // Animate to discard tray (left side, shrink)
+            Animated.parallel([
+                Animated.timing(translateX, {
+                    toValue: -400,
+                    duration: 500,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(translateY, {
+                    toValue: -100,
+                    duration: 500,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(scale, {
+                    toValue: 0.3,
+                    duration: 500,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(opacity, {
+                    toValue: 0,
+                    duration: 400,
+                    delay: 100,
+                    useNativeDriver: true,
+                }),
+            ]).start();
+        }
+    }, [discarding, translateX, translateY, scale, opacity]);
+
     const getSuitColor = (suit: string) => {
         return suit === '♥' || suit === '♦' ? '#DC2626' : '#1F2937';
     };
 
+    const animatedStyle = {
+        transform: [
+            { translateX },
+            { translateY },
+            { scale },
+        ],
+        opacity,
+    };
+
     if (faceDown) {
         return (
-            <View style={[styles.card, styles.cardFaceDown]}>
+            <Animated.View style={[styles.card, styles.cardFaceDown, animatedStyle]}>
                 <View style={styles.cardBack}>
                     <View style={styles.cardBackPattern} />
                 </View>
-            </View>
+            </Animated.View>
         );
     }
 
     return (
-        <View style={styles.card}>
+        <Animated.View style={[styles.card, animatedStyle]}>
             <Text style={[styles.cardRank, { color: getSuitColor(suit!) }]}>{rank}</Text>
             <Text style={[styles.cardSuit, { color: getSuitColor(suit!) }]}>{suit}</Text>
             <Text style={[styles.cardRankBottom, { color: getSuitColor(suit!) }]}>{rank}</Text>
-        </View>
+        </Animated.View>
     );
 }
 
 // Hand component to display a row of cards
-export function Hand({ cards, label }: { cards: { rank: string; suit: string; faceDown?: boolean }[]; label: string }) {
+export function Hand({
+    cards,
+    animateNewCards = false,
+    discarding = false,
+}: {
+    cards: { rank: string; suit: string; faceDown?: boolean; isNew?: boolean }[];
+    animateNewCards?: boolean;
+    discarding?: boolean;
+}) {
     return (
         <View style={styles.handContainer}>
-            <Text style={styles.handLabel}>{label}</Text>
             <View style={styles.cardsRow}>
                 {cards.map((card, index) => (
-                    <Card key={index} rank={card.rank} suit={card.suit} faceDown={card.faceDown} />
+                    <Card
+                        key={`${card.rank}-${card.suit}-${index}-${card.isNew}`}
+                        rank={card.rank}
+                        suit={card.suit}
+                        faceDown={card.faceDown}
+                        animate={animateNewCards && !!card.isNew}
+                        animationDelay={index * 100}
+                        discarding={discarding}
+                    />
                 ))}
             </View>
         </View>

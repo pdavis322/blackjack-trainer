@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-const CHIP_VALUES = [10, 25, 50, 100];
+const CHIP_VALUES = [5, 10, 25, 50, 100];
 
-const CHIP_COLORS: Record<number, { bg: string; border: string }> = {
+const CHIP_COLORS: Record<number, { bg: string; border: string; textColor?: string; innerBorder?: string }> = {
+    5: { bg: '#FFFFFF', border: '#D1D5DB', textColor: '#1F2937', innerBorder: 'rgba(0, 0, 0, 0.4)' }, // White
     10: { bg: '#2563EB', border: '#1D4ED8' }, // Blue
     25: { bg: '#16A34A', border: '#15803D' }, // Green
     50: { bg: '#DC2626', border: '#B91C1C' }, // Red
@@ -13,11 +14,9 @@ const CHIP_COLORS: Record<number, { bg: string; border: string }> = {
 export function Chip({
     value,
     onPress,
-    selected = false
 }: {
     value: number;
     onPress?: () => void;
-    selected?: boolean;
 }) {
     const colors = CHIP_COLORS[value];
 
@@ -29,14 +28,13 @@ export function Chip({
                 {
                     backgroundColor: colors.bg,
                     borderColor: colors.border,
-                    transform: [{ scale: pressed ? 0.95 : selected ? 1.1 : 1 }],
+                    transform: [{ scale: pressed ? 0.95 : 1 }],
                     opacity: pressed ? 0.9 : 1,
                 },
-                selected && styles.chipSelected,
             ]}
         >
-            <View style={styles.chipInner}>
-                <Text style={styles.chipValue}>{value}</Text>
+            <View style={[styles.chipInner, colors.innerBorder && { borderColor: colors.innerBorder }]}>
+                <Text style={[styles.chipValue, colors.textColor && { color: colors.textColor }]} selectable={false}>{value}</Text>
             </View>
         </Pressable>
     );
@@ -49,11 +47,9 @@ export function BettingPanel({
     onDeal?: (bet: number) => void;
     currentBet?: number;
 }) {
-    const [selectedChip, setSelectedChip] = useState<number | null>(null);
     const [bet, setBet] = useState(currentBet);
 
     const handleChipPress = (value: number) => {
-        setSelectedChip(value);
         setBet(prev => prev + value);
     };
 
@@ -73,7 +69,6 @@ export function BettingPanel({
                         key={value}
                         value={value}
                         onPress={() => handleChipPress(value)}
-                        selected={selectedChip === value}
                     />
                 ))}
             </View>
@@ -94,7 +89,7 @@ export function BettingPanel({
                 <Text style={[
                     styles.dealButtonText,
                     bet === 0 && styles.dealButtonTextDisabled,
-                ]}>Deal</Text>
+                ]} selectable={false}>Deal</Text>
             </Pressable>
         </View>
     );
@@ -133,11 +128,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.4,
         shadowRadius: 6,
         elevation: 8,
-    },
-    chipSelected: {
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.5,
-        shadowRadius: 8,
     },
     chipInner: {
         width: 48,
