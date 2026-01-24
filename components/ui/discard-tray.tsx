@@ -21,8 +21,7 @@ export function DiscardTray({ cardCount }: DiscardTrayProps) {
                     style={[
                         styles.cardLayer,
                         {
-                            top: -i * 1.5, // Shift down-left in 3D space by shifting Up in screen space?
-                            // Actually, with the rotation we use, shifting Y negative moves "Up" in world Z
+                            top: -i * 1.5,
                             zIndex: i
                         }
                     ]}
@@ -68,8 +67,6 @@ export function DiscardTray({ cardCount }: DiscardTrayProps) {
                         {deckLayers}
                     </View>
 
-                    {/* Tray Front/Glass (Optional, maybe just inferred by base) */}
-                    {/* Adding a visual border or box around it */}
 
                 </View>
             </View>
@@ -109,7 +106,6 @@ const styles = StyleSheet.create({
         position: 'relative',
         width: 60,
         height: 80,
-        // The requested 3D transformation
         transform: [
             { perspective: 800 },
             { rotateX: '60deg' },
