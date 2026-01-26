@@ -12,7 +12,10 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v6
-
+      - name: Configure git
+        uses: oleksiyrudenko/gha-git-credentials@v2-latest
+        with:
+          git-credentials: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and Deploy
         run: |
           npm ci
