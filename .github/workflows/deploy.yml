@@ -21,9 +21,5 @@ jobs:
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
-        on: 
-          push:
-            branches:
-              - main
         with:
           folder: dist
