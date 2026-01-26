@@ -13,10 +13,12 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v6
 
-      - name: Deploy
+      - name: Build and Deploy
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
         run: |
-          pwd
-          ls
+          npm ci
           npx expo export -p web
           npx gh-pages --nojekyll -d dist
-
