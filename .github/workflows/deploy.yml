@@ -15,6 +15,7 @@ jobs:
 
       - name: Deploy
         run: |
+          pwd
           npx expo export -p web
           npx gh-pages --nojekyll -d dist
 
